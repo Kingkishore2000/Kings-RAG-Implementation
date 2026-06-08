@@ -3,9 +3,7 @@ import chromadb
 import ollama
 
 # Load embedding model
-embedding_model = SentenceTransformer(
-    "all-MiniLM-L6-v2"
-)
+embedding_model = SentenceTransformer("multi-qa-MiniLM-L6-cos-v1")
 
 # Connect to ChromaDB
 client = chromadb.PersistentClient(

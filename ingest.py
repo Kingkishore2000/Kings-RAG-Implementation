@@ -2,10 +2,11 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
 import chromadb
+import uuid
 
 # Load both PDFs
 documents = []
-pdf_files = ["data/sample.pdf", "data/India_States_and_Capitals.pdf" , "data/Virat_Kohli_Short_Notes.pdf"]
+pdf_files = ["data/Virat_Kohli_Short_Notes.pdf"]
 for pdf_file in pdf_files:
     loader = PyPDFLoader(pdf_file)
     documents.extend(loader.load())
@@ -22,7 +23,7 @@ chunks = splitter.split_documents(documents)
 print(f"Total chunks: {len(chunks)}")
 
 # Embedding model
-embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+embedding_model = SentenceTransformer('multi-qa-MiniLM-L6-cos-v1')
 
 # Create Chroma client
 client = chromadb.PersistentClient(path="./chroma_db")
@@ -34,9 +35,10 @@ for i, chunk in enumerate(chunks):
     embedding = embedding_model.encode(chunk.page_content).tolist()
 
     collection.add(
-        ids=[str(i)],
+ids=[str(uuid.uuid4())],
         documents=[chunk.page_content],
-        embeddings=[embedding]
+        embeddings=[embedding],
+        metadatas=[chunk.metadata]
     )
 
 print("Embeddings stored successfully")
